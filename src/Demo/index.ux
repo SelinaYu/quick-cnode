@@ -1,0 +1,105 @@
+<template>
+    <div class="tutorial-page">
+      <!-- div组件模拟选项卡功能 -->
+      <div class="div-tabs">
+        <!-- tabs的head部分 -->
+        <div class="div-tabbar">
+          <list for="menu">
+              <list-item type="menu" class="content-item">
+                  <text onclick="showContent($item.key)">{{$item.value}}</text>
+              </list-item>            
+          </list>
+        </div>
+        <!-- tabs的body部分 -->
+        <div class="div-tabcontent">
+          <div class="div-tabcontent-section" >
+            <text>content1</text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <style>
+      .tutorial-page {
+        flex: 1;
+        flex-direction: column;
+      }
+      .div-tabcontent {
+            flex: 1;
+            background-color: #eeeeee;
+          }    
+      .div-tabcontent-section {
+          flex: 1;
+          justify-content: center;
+          margin: 10px;
+          background-color: #ffffff;
+        }
+        .div-tabcontent-section  text {
+          color: #FF0000;
+          text-align: center;
+        }
+        .div-tabs {
+          flex: 1;
+          flex-direction: column;
+        }                    
+        .div-tabbar {
+            height: 50px;
+        }
+        .div-tabbar text {
+          margin: 0 10px;
+          color: #80bd01;
+        }                
+    </style>
+
+<script>
+  import router from '@system.router';
+  import fetch from '@system.fetch';
+  import { Prefix } from '../config.js';
+  export default {
+    private: {
+      type: 'all',
+      menu: [
+        {
+          "key":"all",
+          "value":"全部"
+        },
+        {
+          "key":"good",
+          "value":"精华"
+        },
+        {
+          "key":"share",
+          "value":"分享"
+        },
+        {
+          "key":"ask",
+          "value":"问答"
+        },
+        {
+          "key":"job",
+          "value":"招聘"
+        },
+      ],
+    },
+    onInit () {
+    },
+    showContent (key) {
+      console.log(key)
+      fetch.fetch({
+        url: 'https://cnodejs.org/api/v1/api/v1/topics',
+        success: function (data) {
+          console.log(data)
+          console.info('success');
+        },
+        fail: function (data, code) {
+          console.log(data,code)
+          console.info('fail');
+        },
+        complete: function () {
+          console.info('complete')
+        }
+      })
+    }
+  }
+</script>
