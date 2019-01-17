@@ -7,15 +7,37 @@
           <list for="menu">
               <list-item type="menu" class="content-item">
                   <text onclick="showContent($item.key)">{{$item.value}}</text>
-              </list-item>            
+              </list-item>
           </list>
         </div>
         <!-- tabs的body部分 -->
         <div class="div-tabcontent">
-          <div class="div-tabcontent-section" >
-            <text>content1</text>
-          </div>
-        </div>
+            <list>
+              <block for="list">
+                <list-item type="item">
+                    <div class="cell">
+                        <a class="user_avatar pull-left" href="/user/{{$item.author.loginname}}">
+                          <img src="{{$item.author.avatar_url}}">
+                        </a>
+                        <div class="reply_count pull-left">
+                            <div class="count_of_replies">
+                              {{$item.reply_count}}
+                            </div>
+                            <div class="count_seperator">/</div>
+                            <div class="count_of_visits">
+                              {{$item.visit_count}}
+                            </div>
+                          </div>
+                          <div class="topic_title_wrapper">
+                           <div class="put_top" if="{{$item.top === 'True'}}">置顶</div>
+                            <a class="topic_title" href="/topic/+{{$item.id}}">
+                               {{$item.title}}
+                            </a>
+                          </div>
+                      </div>
+                </list-item>
+              </block>
+            </list>
       </div>
     </div>
   </template>
@@ -28,36 +50,31 @@
       .div-tabcontent {
             flex: 1;
             background-color: #eeeeee;
-          }    
-      .div-tabcontent-section {
-          flex: 1;
-          justify-content: center;
-          margin: 10px;
-          background-color: #ffffff;
-        }
-        .div-tabcontent-section  text {
-          color: #FF0000;
-          text-align: center;
-        }
-        .div-tabs {
-          flex: 1;
-          flex-direction: column;
-        }                    
-        .div-tabbar {
-            height: 50px;
-        }
-        .div-tabbar text {
-          margin: 0 10px;
-          color: #80bd01;
-        }                
+            padding:20px;
+        }    
+      .div-tabs {
+        flex: 1;
+        flex-direction: column;
+      }                    
+      .div-tabbar {
+          height: 50px;
+      }
+      .div-tabbar text {
+        margin: 0 10px;
+        color: #80bd01;
+      }
+      .div-tabcontent .cell{
+        padding-right: 10px;
+        background-color: #ffffff;
+      }                
     </style>
 
 <script>
   import router from '@system.router';
   import fetch from '@system.fetch';
-  import { Prefix } from '../config.js';
+  import config from '../config.js';
   export default {
-    private: {
+    data: {
       type: 'all',
       menu: [
         {
@@ -81,16 +98,21 @@
           "value":"招聘"
         },
       ],
+      list: []
     },
-    onInit () {
+     onInit () {
+      console.log(config.Prefix)
+      this.showContent();
     },
     showContent (key) {
-      console.log(key)
+      let _this = this;
       fetch.fetch({
-        url: 'https://cnodejs.org/api/v1/api/v1/topics',
-        success: function (data) {
-          console.log(data)
-          console.info('success');
+        url: config.Prefix + '/topics',
+        success: function (res) {
+          res = res.data;
+          res = JSON.parse(res);
+          _this.list = res.data;
+          console.log(JSON.stringify(_this.list+'FFFF'))
         },
         fail: function (data, code) {
           console.log(data,code)

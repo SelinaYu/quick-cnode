@@ -128,17 +128,108 @@
 	          ],
 	          "children": [
 	            {
-	              "type": "div",
+	              "type": "list",
 	              "attr": {},
-	              "classList": [
-	                "div-tabcontent-section"
-	              ],
 	              "children": [
 	                {
-	                  "type": "text",
-	                  "attr": {
-	                    "value": "content1"
-	                  }
+	                  "type": "block",
+	                  "attr": {},
+	                  "repeat": function () {return this.list},
+	                  "children": [
+	                    {
+	                      "type": "list-item",
+	                      "attr": {
+	                        "type": "item"
+	                      },
+	                      "children": [
+	                        {
+	                          "type": "div",
+	                          "attr": {},
+	                          "classList": [
+	                            "cell"
+	                          ],
+	                          "children": [
+	                            {
+	                              "type": "a",
+	                              "attr": {
+	                                "href": function () {return '/user/' + (this.$item.author.loginname)}
+	                              },
+	                              "classList": [
+	                                "user_avatar",
+	                                "pull-left"
+	                              ],
+	                              "children": [
+	                                {
+	                                  "type": "image",
+	                                  "attr": {
+	                                    "src": function () {return this.$item.author.avatar_url}
+	                                  }
+	                                }
+	                              ]
+	                            },
+	                            {
+	                              "type": "div",
+	                              "attr": {},
+	                              "classList": [
+	                                "reply_count",
+	                                "pull-left"
+	                              ],
+	                              "children": [
+	                                {
+	                                  "type": "div",
+	                                  "attr": {},
+	                                  "classList": [
+	                                    "count_of_replies"
+	                                  ]
+	                                },
+	                                {
+	                                  "type": "div",
+	                                  "attr": {},
+	                                  "classList": [
+	                                    "count_seperator"
+	                                  ]
+	                                },
+	                                {
+	                                  "type": "div",
+	                                  "attr": {},
+	                                  "classList": [
+	                                    "count_of_visits"
+	                                  ]
+	                                }
+	                              ]
+	                            },
+	                            {
+	                              "type": "div",
+	                              "attr": {},
+	                              "classList": [
+	                                "topic_title_wrapper"
+	                              ],
+	                              "children": [
+	                                {
+	                                  "type": "div",
+	                                  "attr": {},
+	                                  "classList": [
+	                                    "put_top"
+	                                  ],
+	                                  "shown": function () {return this.$item.top==='True'}
+	                                },
+	                                {
+	                                  "type": "a",
+	                                  "attr": {
+	                                    "href": function () {return '/topic/+' + (this.$item.id)},
+	                                    "value": function () {return this.$item.title}
+	                                  },
+	                                  "classList": [
+	                                    "topic_title"
+	                                  ]
+	                                }
+	                              ]
+	                            }
+	                          ]
+	                        }
+	                      ]
+	                    }
+	                  ]
 	                }
 	              ]
 	            }
@@ -160,38 +251,11 @@
 	  },
 	  ".div-tabcontent": {
 	    "flex": 1,
-	    "backgroundColor": "#eeeeee"
-	  },
-	  ".div-tabcontent-section": {
-	    "flex": 1,
-	    "justifyContent": "center",
-	    "marginTop": "10px",
-	    "marginRight": "10px",
-	    "marginBottom": "10px",
-	    "marginLeft": "10px",
-	    "backgroundColor": "#ffffff"
-	  },
-	  ".div-tabcontent-section  text": {
-	    "color": "#FF0000",
-	    "textAlign": "center",
-	    "_meta": {
-	      "ruleDef": [
-	        {
-	          "t": "a",
-	          "n": "class",
-	          "i": false,
-	          "a": "element",
-	          "v": "div-tabcontent-section"
-	        },
-	        {
-	          "t": "d"
-	        },
-	        {
-	          "t": "t",
-	          "n": "text"
-	        }
-	      ]
-	    }
+	    "backgroundColor": "#eeeeee",
+	    "paddingTop": "20px",
+	    "paddingRight": "20px",
+	    "paddingBottom": "20px",
+	    "paddingLeft": "20px"
 	  },
 	  ".div-tabs": {
 	    "flex": 1,
@@ -224,6 +288,31 @@
 	        }
 	      ]
 	    }
+	  },
+	  ".div-tabcontent .cell": {
+	    "paddingRight": "10px",
+	    "backgroundColor": "#ffffff",
+	    "_meta": {
+	      "ruleDef": [
+	        {
+	          "t": "a",
+	          "n": "class",
+	          "i": false,
+	          "a": "element",
+	          "v": "div-tabcontent"
+	        },
+	        {
+	          "t": "d"
+	        },
+	        {
+	          "t": "a",
+	          "n": "class",
+	          "i": false,
+	          "a": "element",
+	          "v": "cell"
+	        }
+	      ]
+	    }
 	  }
 	}
 
@@ -249,10 +338,12 @@
 	
 	var _config = __webpack_require__(7);
 	
+	var _config2 = _interopRequireDefault(_config);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	  private: {
+	  data: {
 	    type: 'all',
 	    menu: [{
 	      "key": "all",
@@ -269,16 +360,22 @@
 	    }, {
 	      "key": "job",
 	      "value": "招聘"
-	    }]
+	    }],
+	    list: []
 	  },
-	  onInit: function onInit() {},
+	  onInit: function onInit() {
+	    console.log(_config2.default.Prefix);
+	    this.showContent();
+	  },
 	  showContent: function showContent(key) {
-	    console.log(key);
+	    var _this = this;
 	    _system4.default.fetch({
-	      url: 'https://cnodejs.org/api/v1/api/v1/topics',
-	      success: function success(data) {
-	        console.log(data);
-	        console.info('success');
+	      url: _config2.default.Prefix + '/topics',
+	      success: function success(res) {
+	        res = res.data;
+	        res = JSON.parse(res);
+	        _this.list = res.data;
+	        console.log(JSON.stringify(_this.list + 'FFFF'));
 	      },
 	      fail: function fail(data, code) {
 	        console.log(data, code);
