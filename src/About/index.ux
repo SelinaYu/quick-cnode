@@ -28,8 +28,7 @@
       <text class="detail-content">{{subjectInfo}}</text>
     </div>
 
-    <!-- 创建快捷方式 -->
-    <input class="btn" type="button" onclick="createShortcut" value="创建快捷方式">
+
 
     <!-- 版权信息 -->
     <text id="footer">{{copyright}}</text>
@@ -145,17 +144,14 @@
     props: ['name', 'icon'],
     data: {
       desc: '即点即用，让你省去下载安装的步骤，立即使用各类服务',
-      serviceType: '工具类',
-      subjectInfo: 'xxx有限公司',
+      serviceType: '社区类',
+      subjectInfo: 'selinayu',
       copyright: ''
     },
     onInit () {
       // 设置标题栏
       this.$page.setTitleBar({ text: this.name })
     },
-    createShortcut () {
-      // 创建快捷方式
-      this.$app.createShortcut()
-    }
+
   }
 </script>

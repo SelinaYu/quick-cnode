@@ -2,38 +2,37 @@
     <div class="tutorial-page">
       <!-- div组件模拟选项卡功能 -->
       <div class="div-tabs">
+      <div class="head-logo">
+          <image src="../Common/cnode_title.jpg">
+            <text>cnode 社区</text>
+      </div>
         <!-- tabs的head部分 -->
-        <div class="div-tabbar">
-          <list for="menu">
-              <list-item type="menu" class="content-item">
-                  <text onclick="showContent($item.key)">{{$item.value}}</text>
-              </list-item>
+        <div class="div-tabbar" >
+          <list>
+            <block for="menu">
+              <list-item type="menu" class="content-item" >
+                  <text class="{{ $item.key === type ? 'text_actived': 'text_tab' }}" onclick="showContent($item.key)">{{$item.value}}</text>
+                </list-item>
+            </block>  
           </list>
         </div>
         <!-- tabs的body部分 -->
         <div class="div-tabcontent">
-            <list>
+            <list  ontouchmove="move">
               <block for="list">
                 <list-item type="item">
-                    <div class="cell">
-                        <a class="user_avatar pull-left" href="/user/{{$item.author.loginname}}">
-                          <img src="{{$item.author.avatar_url}}">
-                        </a>
-                        <div class="reply_count pull-left">
-                            <div class="count_of_replies">
-                              {{$item.reply_count}}
+                    <div class="cell" onclick="toDetail($item.id)">
+                        <image src="{{$item.author.avatar_url}}" alt="{{$item.author.loginname}}"> 
+                          <div class="topic_title_wrapper" >
+                              <text class="title">{{$item.title}}</text> 
+                              <div class="topic_comment">
+                                  <text class="tabtype">{{TabType[$item.tab]}}</text>
+                                  <text class="dot">•</text>
+                                  <text>{{$item.author.loginname}}</text>
+                                  <text class="dot">•</text>                                  
+                                  <text><span>{{$item.reply_count}}</span><span >/{{$item.visit_count}}</span></text>
+                                </div>
                             </div>
-                            <div class="count_seperator">/</div>
-                            <div class="count_of_visits">
-                              {{$item.visit_count}}
-                            </div>
-                          </div>
-                          <div class="topic_title_wrapper">
-                           <div class="put_top" if="{{$item.top === 'True'}}">置顶</div>
-                            <a class="topic_title" href="/topic/+{{$item.id}}">
-                               {{$item.title}}
-                            </a>
-                          </div>
                       </div>
                 </list-item>
               </block>
@@ -50,29 +49,96 @@
       .div-tabcontent {
             flex: 1;
             background-color: #eeeeee;
-            padding:20px;
+            padding:10px;
+            border-radius: 5px;
         }    
       .div-tabs {
         flex: 1;
         flex-direction: column;
-      }                    
+      }   
+      .div-tabs .head-logo{
+        height: 100px;
+        margin: 0 10px;
+        padding: 0 10px;
+        background-color: #333333;
+        display: flex;
+        justify-content: space-between
+      }           
+      .div-tabs .head-logo image{
+        width: 200px;
+        height: 100px;
+      }
+      .div-tabs .head-logo text{
+        color: #ffffff;
+        font-size: 40px;
+      }      
       .div-tabbar {
-          height: 50px;
+          margin: 0 10px;
+          background-color: #333333;
+      }
+
+      .div-tabbar list{
+          flex-direction: row;
+          height: 100px;
       }
       .div-tabbar text {
-        margin: 0 10px;
         color: #80bd01;
+        margin: 25px 10px 20px;
+        padding: 5px 10px;
+      }
+      .div-tabbar list-item .text_actived{
+          background-color: #80bd01;
+          color: #ffffff;
+          border-radius: 5px;
       }
       .div-tabcontent .cell{
-        padding-right: 10px;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
         background-color: #ffffff;
-      }                
+        height: 200px;
+        width:100%;
+      }
+      .cell image{
+        width: 100px;
+        height: 100px;
+      }
+      .div-tabcontent .cell .reply_count{
+        width: 80px;
+        font-size: 16px;
+        padding: 0 10px;
+      }     
+      .div-tabcontent .cell .topic_title_wrapper{
+        padding-left: 10px;
+        flex-direction: column;
+        flex: 1;
+      }
+      .cell .topic_title_wrapper .title{
+        font-weight: bold;
+      }
+      .cell .topic_comment{
+        padding-top: 10px;
+      }
+      .cell .topic_comment .tabtype{
+        background-color: #eeeeee;
+        padding: 0 10px;
+        border-radius: 5px;
+      }
+      .cell .topic_comment text{
+        /* padding: 5px 10px; */
+      }
+      .cell .topic_comment .dot{
+        padding: 5px 10px;
+      }        
     </style>
 
 <script>
   import router from '@system.router';
   import fetch from '@system.fetch';
   import config from '../config.js';
+  import webview from '@system.webview';
+
   export default {
     data: {
       type: 'all',
@@ -98,21 +164,36 @@
           "value":"招聘"
         },
       ],
-      list: []
+      TabType:{
+        'all': '全部',
+        'good': '精华',
+        'share': '分享',
+        'ask': '问答',
+        'job': '招聘'
+      },
+      list: [],
     },
      onInit () {
       console.log(config.Prefix)
       this.showContent();
     },
+    onMenuPress() {
+      this.$app.showMenu()
+    },
     showContent (key) {
       let _this = this;
+      _this.type = key || 'all';
+
       fetch.fetch({
         url: config.Prefix + '/topics',
+        data: {
+          tab: key || 'all'
+        },
         success: function (res) {
           res = res.data;
           res = JSON.parse(res);
           _this.list = res.data;
-          console.log(JSON.stringify(_this.list+'FFFF'))
+          console.log(JSON.stringify(_this.list))
         },
         fail: function (data, code) {
           console.log(data,code)
@@ -122,6 +203,15 @@
           console.info('complete')
         }
       })
+    },
+    toDetail(id){
+        router.push({
+          uri: 'DetailPage',
+          params: { id: id}
+        })
+    },
+    move(event){
+        console.log(JSON.stringify(event))
     }
   }
 </script>

@@ -1,0 +1,43 @@
+<template>
+  <!-- template里只能有一个根节点 -->
+  <div class="detail-page">
+      <web src="https://cnodejs.org/topic/{{id}}"></web>
+  </div>
+</template>
+
+<style>
+  .detail-page .navbar{
+    display: none;
+  }
+
+</style>
+
+<script>
+  import config from '../config.js';
+  import router from '@system.router';
+  import fetch from '@system.fetch';
+  import webview from '@system.webview';
+  export default {
+    data: {
+      id: '',
+      data: {},
+      src: ''
+    },
+    onInit(){
+      this.src = 'https://cnodejs.org/topic/'+this.id;
+    },
+    onBackPress(){
+      
+    },
+    /**
+     * 当用户点击菜单按钮时触发，调用app中定义的方法showMenu
+     * 注意：使用加载器测试`创建桌面快捷方式`功能时，请先在`系统设置`中打开`应用加载器`的`桌面快捷方式`权限
+     */
+    onMenuPress() {
+      const obj ={
+        data: this.src
+      }
+      this.$app.showDetailMenu(obj)
+    }
+  }
+</script>
