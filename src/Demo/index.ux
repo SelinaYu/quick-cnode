@@ -18,10 +18,10 @@
         </div>
         <!-- tabs的body部分 -->
         <div class="div-tabcontent">
-            <list  ontouchmove="move">
+            <list>
               <block for="list">
                 <list-item type="item">
-                    <div class="cell" onclick="toDetail($item.id)">
+                    <div class="cell" onclick="toDetail($item.id,$item.title)">
                         <image src="{{$item.author.avatar_url}}" alt="{{$item.author.loginname}}"> 
                           <div class="topic_title_wrapper" >
                               <text class="title">{{$item.title}}</text> 
@@ -37,21 +37,17 @@
                 </list-item>
               </block>
             </list>
-      </div>
+          </div>
     </div>
+    <div class="next_btn" onclick="loadNext()"><text>预加载下一页</text></div>
+
   </template>
 
   <style>
       .tutorial-page {
         flex: 1;
         flex-direction: column;
-      }
-      .div-tabcontent {
-            flex: 1;
-            background-color: #eeeeee;
-            padding:10px;
-            border-radius: 5px;
-        }    
+      } 
       .div-tabs {
         flex: 1;
         flex-direction: column;
@@ -91,12 +87,25 @@
           color: #ffffff;
           border-radius: 5px;
       }
+      .div-tabcontent {
+            flex-direction: column;
+            flex: 1;
+            background-color: #ffffff;
+            padding:10px;
+            border-radius: 5px;
+        }   
+        .div-tabcontent list{
+          flex-direction: column;
+          columns: 1;
+          flex: 1;
+          
+        }
       .div-tabcontent .cell{
+        background-color: #eeeeee;
         display: flex;
         align-items: center;
         padding: 10px;
         margin-bottom: 10px;
-        background-color: #ffffff;
         height: 200px;
         width:100%;
       }
@@ -130,7 +139,24 @@
       }
       .cell .topic_comment .dot{
         padding: 5px 10px;
-      }        
+      }   
+      .next_btn{
+        flex-direction: column;
+        height: 230px;
+        width: 80px;        
+        position: fixed;
+        right: 0;
+        bottom: 300px;
+        background-color:#ffffff;
+        color: gray;
+        text-align: center;
+        padding: 10px 25px;
+        border-top-left-radius: 30px;
+        border-bottom-left-radius: 30px;
+      }
+      .next_btn text{
+        font-size: 30px
+      }     
     </style>
 
 <script>
@@ -138,7 +164,7 @@
   import fetch from '@system.fetch';
   import config from '../config.js';
   import webview from '@system.webview';
-
+  import  prompt from '@system.prompt';
   export default {
     data: {
       type: 'all',
@@ -172,6 +198,7 @@
         'job': '招聘'
       },
       list: [],
+      page: 1
     },
      onInit () {
       console.log(config.Prefix)
@@ -198,20 +225,48 @@
         fail: function (data, code) {
           console.log(data,code)
           console.info('fail');
+          prompt.showToast({ message: 'error' + data })
         },
         complete: function () {
           console.info('complete')
         }
       })
     },
-    toDetail(id){
+    
+    toDetail(id, title){
         router.push({
           uri: 'DetailPage',
-          params: { id: id}
+          params: { id: id, title: title}
         })
     },
-    move(event){
-        console.log(JSON.stringify(event))
+    loadNext(){
+      let page = this.page + 1;
+      let data = {
+        tab: this.type,
+        page: page
+      }
+      let _this = this;
+      fetch.fetch({
+        url: config.Prefix + '/topics',
+        data: data,
+        success: function (res) {
+          res = res.data;
+          res = JSON.parse(res);
+          let list = res.data;
+          let newList = _this.list.concat(list)
+          _this.list = newList;
+          console.log(JSON.stringify(_this.list))
+        },
+        fail: function (data, code) {
+          console.log(data,code)
+          console.info('fail');
+          prompt.showToast({ message: 'error' + data })
+
+        },
+        complete: function () {
+          console.info('complete')
+        }
+      })
     }
   }
 </script>

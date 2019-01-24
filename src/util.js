@@ -6,7 +6,7 @@ function showMenu () {
   var router = require('@system.router');
   var appInfo = require('@system.app').getInfo()
   prompt.showContextMenu({
-    itemList: [ '关于'],
+    itemList: ['关于'],
     success: function (ret) {
       console.log(JSON.stringify(ret), 'ffff')
       switch (ret.index) {

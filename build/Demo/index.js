@@ -101,15 +101,6 @@ module.exports = {
     "flex": 1,
     "flexDirection": "column"
   },
-  ".div-tabcontent": {
-    "flex": 1,
-    "backgroundColor": "#eeeeee",
-    "paddingTop": "10px",
-    "paddingRight": "10px",
-    "paddingBottom": "10px",
-    "paddingLeft": "10px",
-    "borderRadius": "5px"
-  },
   ".div-tabs": {
     "flex": 1,
     "flexDirection": "column"
@@ -304,7 +295,41 @@ module.exports = {
       ]
     }
   },
+  ".div-tabcontent": {
+    "flexDirection": "column",
+    "flex": 1,
+    "backgroundColor": "#ffffff",
+    "paddingTop": "10px",
+    "paddingRight": "10px",
+    "paddingBottom": "10px",
+    "paddingLeft": "10px",
+    "borderRadius": "5px"
+  },
+  ".div-tabcontent list": {
+    "flexDirection": "column",
+    "columns": 1,
+    "flex": 1,
+    "_meta": {
+      "ruleDef": [
+        {
+          "t": "a",
+          "n": "class",
+          "i": false,
+          "a": "element",
+          "v": "div-tabcontent"
+        },
+        {
+          "t": "d"
+        },
+        {
+          "t": "t",
+          "n": "list"
+        }
+      ]
+    }
+  },
   ".div-tabcontent .cell": {
+    "backgroundColor": "#eeeeee",
     "display": "flex",
     "alignItems": "center",
     "paddingTop": "10px",
@@ -312,7 +337,6 @@ module.exports = {
     "paddingBottom": "10px",
     "paddingLeft": "10px",
     "marginBottom": "10px",
-    "backgroundColor": "#ffffff",
     "height": "200px",
     "width": "100%",
     "_meta": {
@@ -597,6 +621,44 @@ module.exports = {
         }
       ]
     }
+  },
+  ".next_btn": {
+    "flexDirection": "column",
+    "height": "230px",
+    "width": "80px",
+    "position": "fixed",
+    "right": "0px",
+    "bottom": "300px",
+    "backgroundColor": "#ffffff",
+    "color": "#808080",
+    "textAlign": "center",
+    "paddingTop": "10px",
+    "paddingRight": "25px",
+    "paddingBottom": "10px",
+    "paddingLeft": "25px",
+    "borderTopLeftRadius": "30px",
+    "borderBottomLeftRadius": "30px"
+  },
+  ".next_btn text": {
+    "fontSize": "30px",
+    "_meta": {
+      "ruleDef": [
+        {
+          "t": "a",
+          "n": "class",
+          "i": false,
+          "a": "element",
+          "v": "next_btn"
+        },
+        {
+          "t": "d"
+        },
+        {
+          "t": "t",
+          "n": "text"
+        }
+      ]
+    }
   }
 }
 
@@ -697,9 +759,6 @@ module.exports = {
             {
               "type": "list",
               "attr": {},
-              "events": {
-                "touchmove": "move"
-              },
               "children": [
                 {
                   "type": "block",
@@ -719,7 +778,7 @@ module.exports = {
                             "cell"
                           ],
                           "events": {
-                            "click": function (evt) {this.toDetail(this.$item.id,evt)}
+                            "click": function (evt) {this.toDetail(this.$item.id,this.$item.title,evt)}
                           },
                           "children": [
                             {
@@ -818,6 +877,24 @@ module.exports = {
           ]
         }
       ]
+    },
+    {
+      "type": "div",
+      "attr": {},
+      "classList": [
+        "next_btn"
+      ],
+      "events": {
+        "click": function (evt) {this.loadNext(evt)}
+      },
+      "children": [
+        {
+          "type": "text",
+          "attr": {
+            "value": "预加载下一页"
+          }
+        }
+      ]
     }
   ]
 }
@@ -845,6 +922,8 @@ var _system2 = _interopRequireDefault($app_require$("@app-module/system.fetch"))
 var _config = _interopRequireDefault(__webpack_require__(/*! ../config.js */ "./src/config.js"));
 
 var _system3 = _interopRequireDefault($app_require$("@app-module/system.webview"));
+
+var _system4 = _interopRequireDefault($app_require$("@app-module/system.prompt"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -876,7 +955,8 @@ var _default = {
       'ask': '问答',
       'job': '招聘'
     },
-    list: []
+    list: [],
+    page: 1
   },
   onInit: function onInit() {
     console.log(_config.default.Prefix);
@@ -904,22 +984,59 @@ var _default = {
       fail: function fail(data, code) {
         console.log(data, code);
         console.info('fail');
+
+        _system4.default.showToast({
+          message: 'error' + data
+        });
       },
       complete: function complete() {
         console.info('complete');
       }
     });
   },
-  toDetail: function toDetail(id) {
+  toDetail: function toDetail(id, title) {
     _system.default.push({
       uri: 'DetailPage',
       params: {
-        id: id
+        id: id,
+        title: title
       }
     });
   },
-  move: function move(event) {
-    console.log(JSON.stringify(event));
+  loadNext: function loadNext() {
+    var page = this.page + 1;
+    var data = {
+      tab: this.type,
+      page: page
+    };
+
+    var _this = this;
+
+    _system2.default.fetch({
+      url: _config.default.Prefix + '/topics',
+      data: data,
+      success: function success(res) {
+        res = res.data;
+        res = JSON.parse(res);
+        var list = res.data;
+
+        var newList = _this.list.concat(list);
+
+        _this.list = newList;
+        console.log(JSON.stringify(_this.list));
+      },
+      fail: function fail(data, code) {
+        console.log(data, code);
+        console.info('fail');
+
+        _system4.default.showToast({
+          message: 'error' + data
+        });
+      },
+      complete: function complete() {
+        console.info('complete');
+      }
+    });
   }
 };
 exports.default = _default;

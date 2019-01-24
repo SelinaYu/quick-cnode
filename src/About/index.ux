@@ -28,7 +28,8 @@
       <text class="detail-content">{{subjectInfo}}</text>
     </div>
 
-
+    <!-- 创建快捷方式 -->
+    <!-- <input class="btn" type="button" onclick="createShortcut" value="创建快捷方式" /> -->
 
     <!-- 版权信息 -->
     <text id="footer">{{copyright}}</text>
@@ -152,6 +153,9 @@
       // 设置标题栏
       this.$page.setTitleBar({ text: this.name })
     },
-
+    createShortcut () {
+      // 创建快捷方式
+      this.$app.$def.createShortcut()
+    }
   }
 </script>

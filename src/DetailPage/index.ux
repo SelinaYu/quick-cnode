@@ -20,6 +20,7 @@
   export default {
     data: {
       id: '',
+      title:'',
       data: {},
       src: ''
     },
@@ -35,7 +36,7 @@
      */
     onMenuPress() {
       const obj ={
-        data: this.src
+        data:  this.title + this.src
       }
       this.$app.showDetailMenu(obj)
     }

@@ -372,6 +372,9 @@ var _default = {
     this.$page.setTitleBar({
       text: this.name
     });
+  },
+  createShortcut: function createShortcut() {
+    this.$app.$def.createShortcut();
   }
 };
 exports.default = _default;
